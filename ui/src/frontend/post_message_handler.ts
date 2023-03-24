@@ -14,11 +14,11 @@
 
 import * as m from 'mithril';
 
-import {Actions, PostedScrollToRange, PostedTrace} from '../common/actions';
+import { Actions, PostedScrollToRange, PostedTrace } from '../common/actions';
 
-import {globals} from './globals';
-import {showModal} from './modal';
-import {focusHorizontalRange} from './scroll_helper';
+import { globals } from './globals';
+import { showModal } from './modal';
+import { focusHorizontalRange } from './scroll_helper';
 
 interface PostedTraceWrapped {
   perfetto: PostedTrace;
@@ -86,7 +86,7 @@ export function postMessageHandler(messageEvent: MessageEvent) {
   const fromOpenee = (messageEvent.source as WindowProxy).opener === window;
 
   if (messageEvent.source === null ||
-      !(fromOpener || fromIframeHost || fromOpenee)) {
+    !(fromOpener || fromIframeHost || fromOpenee)) {
     // This can happen if an extension tries to postMessage.
     return;
   }
@@ -119,12 +119,12 @@ export function postMessageHandler(messageEvent: MessageEvent) {
       keepApiOpen = true;
     }
   } else if (messageEvent.data instanceof ArrayBuffer) {
-    postedTrace = {title: 'External trace', buffer: messageEvent.data};
+    postedTrace = { title: 'External trace', buffer: messageEvent.data };
   } else {
     console.warn(
-        'Unknown postMessage() event received. If you are trying to open a ' +
-        'trace via postMessage(), this is a bug in your code. If not, this ' +
-        'could be due to some Chrome extension.');
+      'Unknown postMessage() event received. If you are trying to open a ' +
+      'trace via postMessage(), this is a bug in your code. If not, this ' +
+      'could be due to some Chrome extension.');
     console.log('origin:', messageEvent.origin, 'data:', messageEvent.data);
     return;
   }
@@ -151,23 +151,23 @@ export function postMessageHandler(messageEvent: MessageEvent) {
   };
 
   // If the origin is trusted open the trace directly.
-  if (isTrustedOrigin(messageEvent.origin)) {
-    openTrace();
-    return;
-  }
+  // if (isTrustedOrigin(messageEvent.origin)) {
+  openTrace();
+  //   return;
+  // }
 
   // If not ask the user if they expect this and trust the origin.
-  showModal({
-    title: 'Open trace?',
-    content:
-        m('div',
-          m('div', `${messageEvent.origin} is trying to open a trace file.`),
-          m('div', 'Do you trust the origin and want to proceed?')),
-    buttons: [
-      {text: 'NO', primary: true},
-      {text: 'YES', primary: false, action: openTrace},
-    ],
-  });
+  // showModal({
+  //   title: 'Open trace?',
+  //   content:
+  //       m('div',
+  //         m('div', `${messageEvent.origin} is trying to open a trace file.`),
+  //         m('div', 'Do you trust the origin and want to proceed?')),
+  //   buttons: [
+  //     {text: 'NO', primary: true},
+  //     {text: 'YES', primary: false, action: openTrace},
+  //   ],
+  // });
 }
 
 function sanitizePostedTrace(postedTrace: PostedTrace): PostedTrace {
@@ -192,7 +192,7 @@ function isTraceViewerReady(): boolean {
 
 const _maxScrollToRangeAttempts = 20;
 async function scrollToTimeRange(
-    postedScrollToRange: PostedScrollToRange, maxAttempts?: number) {
+  postedScrollToRange: PostedScrollToRange, maxAttempts?: number) {
   const ready = isTraceViewerReady();
   if (!ready) {
     if (maxAttempts === undefined) {
@@ -205,20 +205,20 @@ async function scrollToTimeRange(
     setTimeout(scrollToTimeRange, 200, postedScrollToRange, maxAttempts + 1);
   } else {
     focusHorizontalRange(
-        postedScrollToRange.timeStart,
-        postedScrollToRange.timeEnd,
-        postedScrollToRange.viewPercentage);
+      postedScrollToRange.timeStart,
+      postedScrollToRange.timeEnd,
+      postedScrollToRange.viewPercentage);
   }
 }
 
 function isPostedScrollToRange(obj: unknown):
-    obj is PostedScrollToRangeWrapped {
+  obj is PostedScrollToRangeWrapped {
   const wrapped = obj as PostedScrollToRangeWrapped;
   if (wrapped.perfetto === undefined) {
     return false;
   }
   return wrapped.perfetto.timeStart !== undefined ||
-      wrapped.perfetto.timeEnd !== undefined;
+    wrapped.perfetto.timeEnd !== undefined;
 }
 
 function isPostedTraceWrapped(obj: any): obj is PostedTraceWrapped {
@@ -227,5 +227,5 @@ function isPostedTraceWrapped(obj: any): obj is PostedTraceWrapped {
     return false;
   }
   return wrapped.perfetto.buffer !== undefined &&
-      wrapped.perfetto.title !== undefined;
+    wrapped.perfetto.title !== undefined;
 }
